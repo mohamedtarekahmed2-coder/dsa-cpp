@@ -111,35 +111,87 @@ Practical Usage / Code:
 
 */
 
+// ════════════════════════════════════════════════════════════════════════
+// [02 & 03]  VECTOR (DYNAMIC ARRAY)
+// ════════════════════════════════════════════════════════════════════════
+/*
+── Core Structure & Memory Management ───────────────────────────────────────────────
+A vector is a dynamic, flexible array that manages its own heap-allocated memory. It abstracts away raw pointer manipulation while allowing dynamic resizing.
+
+Key Notes:
+    - Requires tracking an internal pointer (`arr`), current active elements (`size`), 
+        and total allocated space (`capacity`).
+    - Constructor must safely allocate memory using `new[]`.
+    - Destructor MUST deallocate memory using `delete[]` to prevent memory leaks.
+    - Bounds checking should always be enforced on element access operations.
+
+Practical Usage / Commands / Code:
+    class Vector {
+    private:
+        int* arr = nullptr;
+        int size = 0;
+        int capacity = 0;
+
+    public:
+        // Initialization
+        Vector(int initial_size) {
+            if(initial_size < 0) initial_size = 1;
+            this->size = initial_size;
+            this->capacity = initial_size;
+            arr = new int[capacity]{}; 
+        }
+        
+        // Cleanup
+        ~Vector() {
+            delete[] arr; 
+            arr = nullptr;
+        }
+    };
+
+Operations / Best Practices:
+    - get(index)            // O(1) Accesses element at index if bounds (0 <= index < size) are valid.
+    - set(index, val)       // O(1) Mutates element at index if bounds are valid.
+    - find(val)             // O(N) Linear search; iterates through array to find value.
+    - get_front()           // O(1) Returns arr[0].
+    - get_back()            // O(1) Returns arr[size - 1].
+
+── Appending & Capacity Trick ───────────────────────────────────────────────
+Growing an array sequentially by 1 element is highly inefficient. 
+The "Capacity Trick" solves this by pre-allocating extra space (usually doubling it) to reduce reallocation frequency.
+
+Key Notes:
+    - Bad approach: Reallocating an array of `size + 1` for every insertion yields O(N) time complexity per push.
+    - Good approach: Doubling `capacity` when full reduces the frequency of copying, achieving O(1) Amortized time complexity.
+    - Expansion steps: Allocate larger array -> Copy old elements -> Swap pointers -> Delete old array memory.
+
+Practical Usage / Commands / Code:
+    // Internal Expansion Logic
+    void expand_capacity() {
+        capacity *= 2;
+        int* new_arr = new int[capacity]{};
+        for (int i = 0; i < size; i++)
+            new_arr[i] = arr[i];
+        swap(new_arr, arr); 
+        delete[] new_arr; 
+    }
+
+    // Optimized Insertion
+    void push_back(int val) {
+        if(size == capacity)
+            expand_capacity();
+        arr[size++] = val;
+    }
+
+Operations / Best Practices:
+    - push_back_bad(val)    // O(N) Time: Avoid resizing by exactly +1 every insertion.
+    - push_back(val)        // O(1) Amortized Time: Use the capacity trick for efficient appends.
+
+*/
+
 #include <iostream>
 using namespace std;
 
-
-
 int main()
-{   
-    int** arr = new int* [5];
-    for (int i = 0; i < 5; i++)
-    {
-        arr[i] = new int[5];
-    }
-    for(int i = 0; i < 5; i++)
-    {
-        for(int j = 0; j < 5; j++)
-        {
-            arr[i][j] = i * j;
-            cout << arr[i][j] << ' ';
-        }
-        cout << '\n';
-    }
-
-    for (int i = 0; i <5; i++)
-    {
-        delete [] arr[i];
-    }
-    
-    delete [] arr;
-
-    
+{
     return 0;
 }
