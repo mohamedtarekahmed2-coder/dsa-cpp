@@ -112,7 +112,57 @@ Practical Usage / Code:
 */
 
 // ════════════════════════════════════════════════════════════════════════
-// [02 & 03]  VECTOR (DYNAMIC ARRAY)
+// [02]  Big O Notation
+// ════════════════════════════════════════════════════════════════════════
+/*
+Measures how the number of operations GROWS with input size N.
+Rule of Thumb:  1 Second ≈ 10^8 ~ 10^9 operations (practically use 10^8).
+
+COMPLEXITY RANKINGS (Best → Worst):
+┌─────────────────┬───────────────┬──────────────────────────────────────┐
+│  Big O          │  Name         │  Example                             │
+├─────────────────┼───────────────┼──────────────────────────────────────┤
+│  O(1)           │  Constant     │  arr[5], min(a,b), swap(a,b)         │
+│  O(log N)       │  Logarithmic  │  binary_search, lower_bound          │
+│  O(N)           │  Linear       │  Single loop over N elements         │
+│  O(N log N)     │  Linearithmic │  sort(arr, arr + n)                  │
+│  O(N^2)         │  Quadratic    │  Two nested loops                    │
+│  O(c^N)         │  Exponential  │  Recursive subsets                   │
+│  O(N!)          │  Factorial    │  next_permutation (all permutations) │
+└─────────────────┴───────────────┴──────────────────────────────────────┘
+
+Speed ranking (Fastest -> Slowest):
+    O(1) < O(log N) < O(N) < O(N log N) < O(N^2) < O(c^N) < O(N!)
+
+HOW TO CALCULATE BIG O:
+    Step 1: Count the expected number of instructions based on input size.
+    Step 2: Drop all constants.       e.g., n^2/2 + 30n  →  n^2 + n
+    Step 3: Keep the dominant term.   e.g., n^2 + n       →  O(n^2)
+    Note:   O(n), O(2n), O(3n) are all treated as O(n).
+
+SPACE COMPLEXITY:
+    Same concept as Time Complexity but measures MEMORY used instead.
+    Also expressed using Big O notation.
+
+TLE / MLE VERDICTS:
+    - TLE (Time Limit Exceeded):   solution exceeds allowed run time.
+    - MLE (Memory Limit Exceeded): solution exceeds allowed memory.
+    - Both mean your logic may be correct but your complexity is too high.
+    - Example: N <= 100,000
+        O(N log N) ≈ 10^6  → OK
+        O(N^2)     ≈ 10^10 → TLE
+
+BUILT-IN FUNCTIONS COMPLEXITY:
+    O(1):       min(a,b), max(a,b), swap(a,b)
+    O(log N):   binary_search, lower_bound, upper_bound
+    O(N):       pow(a,n), reverse, min_element, max_element, fill, count, find
+    O(N log N): sort(arr, arr + n)
+    O(N!):      next_permutation(arr, arr + n)
+
+*/
+
+// ════════════════════════════════════════════════════════════════════════
+// [03]  VECTOR (DYNAMIC ARRAY)
 // ════════════════════════════════════════════════════════════════════════
 /*
 ── Core Structure & Memory Management ───────────────────────────────────────────────
@@ -187,6 +237,8 @@ Operations / Best Practices:
     - push_back(val)        // O(1) Amortized Time: Use the capacity trick for efficient appends.
 
 */
+
+
 
 #include <iostream>
 using namespace std;
