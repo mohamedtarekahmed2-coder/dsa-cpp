@@ -166,10 +166,11 @@ BUILT-IN FUNCTIONS COMPLEXITY:
 // ════════════════════════════════════════════════════════════════════════
 /*
 ── Core Structure & Memory Management ───────────────────────────────────────────────
-A vector is a dynamic, flexible array that manages its own heap-allocated memory. It abstracts away raw pointer manipulation while allowing dynamic resizing.
+A vector is a dynamic, flexible array that manages its own heap-allocated memory.
+It abstracts away raw pointer manipulation while allowing dynamic resizing.
 
 Key Notes:
-    - Requires tracking an internal pointer (`arr`), current active elements (`size`), 
+    - Requires tracking an internal pointer (`arr`), current active elements (`size`),
         and total allocated space (`capacity`).
     - Constructor must safely allocate memory using `new[]`.
     - Destructor MUST deallocate memory using `delete[]` to prevent memory leaks.
@@ -188,12 +189,12 @@ Practical Usage / Commands / Code:
             if(initial_size < 0) initial_size = 1;
             this->size = initial_size;
             this->capacity = initial_size;
-            arr = new int[capacity]{}; 
+            arr = new int[capacity]{};
         }
-        
+
         // Cleanup
         ~Vector() {
-            delete[] arr; 
+            delete[] arr;
             arr = nullptr;
         }
     };
@@ -206,7 +207,7 @@ Operations / Best Practices:
     - get_back()            // O(1) Returns arr[size - 1].
 
 ── Appending & Capacity Trick ───────────────────────────────────────────────
-Growing an array sequentially by 1 element is highly inefficient. 
+Growing an array sequentially by 1 element is highly inefficient.
 The "Capacity Trick" solves this by pre-allocating extra space (usually doubling it) to reduce reallocation frequency.
 
 Key Notes:
@@ -221,8 +222,8 @@ Practical Usage / Commands / Code:
         int* new_arr = new int[capacity]{};
         for (int i = 0; i < size; i++)
             new_arr[i] = arr[i];
-        swap(new_arr, arr); 
-        delete[] new_arr; 
+        swap(new_arr, arr);
+        delete[] new_arr;
     }
 
     // Optimized Insertion
@@ -238,6 +239,137 @@ Operations / Best Practices:
 
 */
 
+// ════════════════════════════════════════════════════════════════════════
+// [04]  HASHING (UNORDERED MAP & SET)
+// ════════════════════════════════════════════════════════════════════════
+/*
+── What is a Hash Table ───────────────────────────────────────────────
+A data structure storing key-value pairs that uses a hash function to compute an index for extremely fast data retrieval.
+
+Key Notes:
+    - Average Time Complexity: O(1) for Insert, Delete, and Search.
+    - Worst Time Complexity: O(N) (Occurs when many keys hash to the same index/bucket).
+    - Space Complexity: O(N).
+
+Practical Usage / Commands / Code:
+    // Conceptual Structure:
+    int index = HashFunction(key) % ArraySize;
+    TableArray[index] = value;
+
+Operations / Best Practices:
+    - Determinism      // The same key must ALWAYS compute the same hash code.
+    - Uniformity       // A good hash function distributes keys evenly to minimize collisions.
+
+── Collision Resolution ───────────────────────────────────────────────
+Techniques used when two distinct keys yield the same hash index.
+
+Key Notes:
+    - Chaining (Open Hashing): The default in C++ STL. Each array bucket holds a linked list of colliding elements.
+    - Open Addressing: Elements are stored directly in the array. Probes for next empty slot if full.
+    * Linear Probing: Checks index + 1, + 2, + 3...
+    * Quadratic Probing: Checks index + 1², + 2², + 3²...
+
+Practical Usage / Commands / Code:
+    // Chaining Concept:
+    TableArray[index] --> Node(Key1) --> Node(Key2) --> nullptr
+
+── Hash Implementation Logic (Chaining) ───────────────────────────────────────────────
+Under the hood, it combines an array with pointers to linked lists. Tracks "Load Factor" to maintain O(1) speed.
+
+Key Notes:
+    - Load Factor = (Total Elements) / (Total Buckets).
+
+Practical Usage / Commands / Code:
+    // Generic Node Structure
+    struct HashNode {
+        KeyType key;
+        ValueType val;
+        HashNode* next;
+    };
+
+    // Generic Hash Table Outline
+    class HashTable {
+    private:
+        HashNode** tableArray;
+        int arraySize;
+        int totalElements;
+
+        int hashFunction(KeyType key) { return key % arraySize; }
+        void rehash(int newSize);
+
+    public:
+        void insert(KeyType key, ValueType val); // O(1) inserts at head of chain, checks load factor
+        ValueType get(KeyType key);              // O(1) finds index, traverses chain if needed
+        void remove(KeyType key);                // O(1) removes node from chain, checks load factor
+    };
+
+── Rehashing ───────────────────────────────────────────────
+Dynamically resizing the internal array when the Load Factor crosses specific thresholds to prevent O(N) degradation.
+
+Key Notes:
+    - Upsizing: Usually triggers when Load Factor >= 0.75 (Table size is doubled).
+    - Downsizing: Usually triggers when Load Factor <= 0.25 (Table size is halved).
+
+Practical Usage / Commands / Code:
+    // Generic Rehash Structure:
+    void rehash(int newSize) {
+        HashNode oldTable = tableArray;
+
+        tableArray = new HashNode*[newSize];
+        // 1. Initialize all newTable buckets to nullptr
+        // 2. Traverse oldTable nodes, recompute hash with newSize, link to newTable
+        // 3. delete[] oldTable (only the array, do not delete the nodes themselves)
+    }
+
+── Hash Containers ───────────────────────────────────────────────
+Natively implemented unordered containers that prioritize 
+O(1) average lookup speed over maintaining sorted element order.
+
+Key Notes:
+    - std::unordered_map: Stores unique key-value pairs.
+    - std::unordered_set: Stores unique keys only.
+    - Custom key types require an overloaded operator== and a custom hash functor.
+    - Worst-case O(N) time complexity occurs due to severe hash collisions or frequent rehashing.
+
+Time Complexity:
+    - Search / Lookup: O(1) average, O(N) worst-case.
+    - Insertion:       O(1) average, O(N) worst-case.
+    - Deletion:        O(1) average, O(N) worst-case.
+
+Practical Usage / Commands / Code:
+    #include <unordered_map>
+    #include <unordered_set>
+
+    // Standard declaration
+    std::unordered_map<KeyType, ValueType> mapName;
+    std::unordered_set<KeyType> setName;
+
+    // Custom Key Support Structure
+    struct KeyType {
+        MemberType member;
+        bool operator==(const KeyType& other) const {
+            return member == other.member;
+        }
+    };
+    struct KeyHash {
+        std::size_t operator()(const KeyType& k) const {
+            return std::hash<MemberType>{}(k.member);
+        }
+    };
+    std::unordered_map<KeyType, KeyHash ValueType,> customMap;
+
+    // Efficient existence check (C++20)
+    if (setName.contains(keyVal)) { 
+        // Element found in O(1) average time
+    }
+
+Operations / Best Practices:
+    - mapName[key] = val;       // Inserts val if key is missing; updates val if key exists.
+    - mapName.at(key);          // Returns value; throws std::out_of_range exception if key is missing.
+    - setName.contains(key);    // Returns true if key exists, false if not (C++20, O(1) avg time).
+    - mapName.count(key);       // Returns 1 if key exists, 0 if not (pre-C++20 existence check).
+    - mapName.erase(key);       // Removes key-value pair/element in O(1) average time.
+*/
 
 
 #include <iostream>
