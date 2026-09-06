@@ -244,7 +244,8 @@ Operations / Best Practices:
 // ════════════════════════════════════════════════════════════════════════
 /*
 ── What is a Hash Table ───────────────────────────────────────────────
-A data structure storing key-value pairs that uses a hash function to compute an index for extremely fast data retrieval.
+A data structure storing key-value pairs that uses a 
+hash function to compute an index for extremely fast data retrieval.
 
 Key Notes:
     - Average Time Complexity: O(1) for Insert, Delete, and Search.
@@ -274,7 +275,8 @@ Practical Usage / Commands / Code:
     TableArray[index] --> Node(Key1) --> Node(Key2) --> nullptr
 
 ── Hash Implementation Logic (Chaining) ───────────────────────────────────────────────
-Under the hood, it combines an array with pointers to linked lists. Tracks "Load Factor" to maintain O(1) speed.
+Under the hood, it combines an array with pointers to linked lists. 
+Tracks "Load Factor" to maintain O(1) speed.
 
 Key Notes:
     - Load Factor = (Total Elements) / (Total Buckets).
@@ -303,7 +305,7 @@ Practical Usage / Commands / Code:
         void remove(KeyType key);                // O(1) removes node from chain, checks load factor
     };
 
-── Rehashing ───────────────────────────────────────────────
+── Resizing (Rehashing) ───────────────────────────────────────────────
 Dynamically resizing the internal array when the Load Factor crosses specific thresholds to prevent O(N) degradation.
 
 Key Notes:
@@ -326,8 +328,8 @@ Natively implemented unordered containers that prioritize
 O(1) average lookup speed over maintaining sorted element order.
 
 Key Notes:
-    - std::unordered_map: Stores unique key-value pairs.
-    - std::unordered_set: Stores unique keys only.
+    - unordered_map: Stores unique key-value pairs.
+    - unordered_set: Stores unique keys only.
     - Custom key types require an overloaded operator== and a custom hash functor.
     - Worst-case O(N) time complexity occurs due to severe hash collisions or frequent rehashing.
 
@@ -341,8 +343,8 @@ Practical Usage / Commands / Code:
     #include <unordered_set>
 
     // Standard declaration
-    std::unordered_map<KeyType, ValueType> mapName;
-    std::unordered_set<KeyType> setName;
+    unordered_map<KeyType, ValueType> mapName;
+    unordered_set<KeyType> setName;
 
     // Custom Key Support Structure
     struct KeyType {
@@ -352,11 +354,11 @@ Practical Usage / Commands / Code:
         }
     };
     struct KeyHash {
-        std::size_t operator()(const KeyType& k) const {
-            return std::hash<MemberType>{}(k.member);
+        size_t operator()(const KeyType& k) const {
+            return hash<MemberType>{}(k.member);
         }
     };
-    std::unordered_map<KeyType, KeyHash ValueType,> customMap;
+    unordered_map<KeyType, KeyHash ValueType,> customMap;
 
     // Efficient existence check (C++20)
     if (setName.contains(keyVal)) { 
@@ -365,7 +367,7 @@ Practical Usage / Commands / Code:
 
 Operations / Best Practices:
     - mapName[key] = val;       // Inserts val if key is missing; updates val if key exists.
-    - mapName.at(key);          // Returns value; throws std::out_of_range exception if key is missing.
+    - mapName.at(key);          // Returns value; throws out_of_range exception if key is missing.
     - setName.contains(key);    // Returns true if key exists, false if not (C++20, O(1) avg time).
     - mapName.count(key);       // Returns 1 if key exists, 0 if not (pre-C++20 existence check).
     - mapName.erase(key);       // Removes key-value pair/element in O(1) average time.
