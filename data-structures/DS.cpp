@@ -373,6 +373,109 @@ Operations / Best Practices:
     - mapName.erase(key);       // Removes key-value pair/element in O(1) average time.
 */
 
+// ════════════════════════════════════════════════════════════════════════
+// [05]  STACK
+// ════════════════════════════════════════════════════════════════════════
+/*
+── Core Concept ───────────────────────────────────────────────
+A linear data structure operating on a Last-In-First-Out (LIFO) principle. 
+Elements are added and removed from only one end (the "top").
+
+Key Notes:
+- Time Complexity: O(1) for push(), pop(), top(), and isEmpty().
+- Space Complexity: O(N) where N is the number of elements.
+- Edge Case (Underflow): Accessing top() or calling pop() on an empty stack 
+                        must be guarded (e.g., throwing out_of_range exception) to prevent crashes.
+
+── Vector Implementation ───────────────────────────────────────────────
+Uses vector as the underlying container. 
+It is highly cache-friendly but may experience occasional O(N) reallocations when capacity is reached.
+
+Practical Usage / Code:
+    template 
+    class VectorStack {
+    private:
+        vector v;
+    public:
+        void push(T val) {
+            v.push_back(val);
+        }
+
+        void pop() {
+            if (!isEmpty()) v.pop_back();
+            else throw out_of_range("Stack is empty.");
+        }
+
+        T top() {
+            if (!isEmpty()) return v.back();
+            throw out_of_range("Stack is empty.");
+        }
+
+        bool isEmpty() {
+            return v.empty();
+        }
+    };
+
+Operations / Best Practices:
+    - push_back()   // Simulates pushing to the top of the stack.
+    - pop_back()    // Simulates removing from the top. Guard with isEmpty().
+    - back()        // Peeks at the top element. Guard with isEmpty().
+
+── Linked List Implementation ───────────────────────────────────────────────
+Uses dynamic pointers. 
+Fully dynamic in size without reallocation overhead, 
+but requires extra memory per element (for the pointer) and manual memory management.
+
+Practical Usage / Code:
+    template 
+    class LinkedListStack {
+    private:
+        struct Node {
+            T item;
+            Node* next;
+            Node(T val) : item(val), next(nullptr) {}
+        };
+        Node* topNode = nullptr;
+
+    public:
+        void push(T newItem) {
+            Node* newNode = new Node(newItem);
+            newNode->next = topNode;
+            topNode = newNode;
+        }
+
+        void pop() {
+            if (isEmpty()) throw out_of_range("Stack is empty.");
+            Node* temp = topNode;
+            topNode = topNode->next;
+            delete temp;
+        }
+
+        T top() {
+            if (isEmpty()) throw out_of_range("Stack is empty.");
+            return topNode->item;
+        }
+
+        bool isEmpty() {
+            return topNode == nullptr;
+        }
+
+        ~LinkedListStack() {
+            while (!isEmpty()) {
+                pop();
+            }
+        }
+    };
+
+Operations / Best Practices:
+    - push(val)   // Allocates a new node and inserts it at the head (topNode).
+    - pop()       // Moves the head pointer to the next node and strictly calls `delete` to prevent memory leaks.
+    - Destructor  // Must iteratively pop() all remaining nodes to free memory when the object is destroyed.
+
+*/
+
+
+
 
 #include <iostream>
 using namespace std;
