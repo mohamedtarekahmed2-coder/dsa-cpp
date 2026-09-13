@@ -474,7 +474,149 @@ Operations / Best Practices:
 
 */
 
+// ════════════════════════════════════════════════════════════════════════
+// [06]  LINKED LIST
+// ════════════════════════════════════════════════════════════════════════
+/*
+── singly linked list ───────────────────────────────────────────────
+A linear data structure where each element (node) stores a value and a pointer to the next node.
 
+Key Notes:
+    - Dynamic size (no contiguous memory required).
+    - Time Complexity: Insert/Delete at Head: O(1). Insert at Tail: O(1) (if tail pointer exists). Search/Access: O(N).
+    - Requires manual memory management (deleting nodes) in C++ to avoid memory leaks.
+
+Practical Usage / Commands / Code:
+    // Standard Node Structure
+    struct Node {
+        int item;
+        Node* next;
+        Node(int val = 0) : item(val), next(nullptr) {}
+    };
+
+    class LinkedList {
+    private:
+        Node* head;
+        Node* tail;
+        int size;
+    public:
+        // Core operations implementations:
+        void pushFront(int val) {
+            Node* newNode = new Node(val);
+            newNode->next = head;
+            head = newNode;
+            if (!size) tail = newNode;
+            size++;
+        }
+
+        void reverse() {
+            Node *prev = nullptr, *current = head, *next = nullptr;
+            tail = head;
+            while (current != nullptr) {
+                next = current->next;
+                current->next = prev;
+                prev = current;
+                current = next;
+            }
+            head = prev;
+        }
+    };
+
+Operations / Best Practices:
+    - Push/Pop Front    // O(1) Adds/removes from the beginning of the list.
+    - Push/Pop Back     // O(1) to push (with tail ptr), O(N) to pop (must traverse to find new tail).
+    - Always handle empty list states (head == nullptr) during deletion.
+    - Implement a destructor (~LinkedList) traversing and deleting all nodes.
+
+── dummy node (sentinel node) ────────────────────────────────────────
+A temporary, artificial node placed at the beginning of a list to simplify logic and avoid null-pointer edge cases.
+
+Key Notes:
+    - Eliminates the need for repetitive `if (head == nullptr)` checks.
+    - Guarantees the `tail` or `current` pointer always points to a valid memory address during construction.
+    - Crucial for algorithms that merge, filter, or heavily modify list structures.
+
+Practical Usage / Commands / Code:
+    // Building a new list safely
+    Node* dummy = new Node(0);
+    Node* tail = dummy;
+
+    while (<condition>) {
+        tail->next = new Node(<value>);  // Safe: tail is never nullptr
+        tail = tail->next;
+    }
+
+    Node* resultHead = dummy->next;      // The actual list skips the dummy
+    delete dummy;                        // Free memory
+    return resultHead;
+
+Operations / Best Practices:
+    - Initialization    // Always assign dummy's address to your traversal pointer initially.
+    - Cleanup           // NEVER forget to delete the dummy node before returning the final head.
+
+── doubly linked list ───────────────────────────────────────────────
+A linked list where each node contains pointers to BOTH the next and previous nodes.
+
+Key Notes:
+    - Allows O(1) backwards traversal and O(1) node deletion (if the node pointer is known).
+    - Overhead: Requires extra memory for the `prev` pointer.
+
+Practical Usage / Commands / Code:
+    struct DNode {
+        int item;
+        DNode* next;
+        DNode* prev;
+        DNode(int val = 0) : item(val), next(nullptr), prev(nullptr) {}
+    };
+
+    // O(1) Deletion of a known node:
+    if (node->prev) node->prev->next = node->next;
+    if (node->next) node->next->prev = node->prev;
+    delete node;
+
+── circular linked list ───────────────────────────────────────────────
+A linked list where the last node (tail) points back to the first node (head) instead of null.
+
+Key Notes:
+    - Can be singly or doubly linked.
+    - Useful for round-robin scheduling or continuous looping structures.
+    - Traversal termination condition changes: loop runs while `current->next != head` instead of `!= nullptr`.
+
+Practical Usage / Commands / Code:
+    // Making a singly linked list circular
+    tail->next = head;
+
+    // Traversal example
+    if (!head) return;
+    Node* current = head;
+    do {
+        // process current->item
+        current = current->next;
+    } while (current != head);
+
+── fast and slow pointers ───────────────────────────────────────────
+An algorithmic technique (Floyd's Cycle-Finding) using two pointers traversing the list at different speeds.
+
+Key Notes:
+    - Slow pointer moves 1 step, Fast pointer moves 2 steps.
+    - Space Complexity is strictly O(1).
+    - Used to find the middle of a list, or detect cycles/loops.
+
+Practical Usage / Commands / Code:
+    // 1. Finding the middle of a Linked List
+    Node* slow = head;
+    Node* fast = head;
+
+    // fast && fast->next ensures we don't dereference a nullptr
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;          // Moves 1x
+        fast = fast->next->next;    // Moves 2x
+    }
+    // 'slow' is now pointing to the middle node
+
+    // 2. Cycle Detection
+    // If fast == slow at any point during traversal, a cycle exists.
+*/
 
 
 #include <iostream>
