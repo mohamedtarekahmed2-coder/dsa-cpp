@@ -483,7 +483,9 @@ A linear data structure where each element (node) stores a value and a pointer t
 
 Key Notes:
     - Dynamic size (no contiguous memory required).
-    - Time Complexity: Insert/Delete at Head: O(1). Insert at Tail: O(1) (if tail pointer exists). Search/Access: O(N).
+    - Time Complexity: Insert/Delete at Head: O(1). 
+                       Insert at Tail: O(1) (if tail pointer exists). 
+                       Search/Access: O(N).
     - Requires manual memory management (deleting nodes) in C++ to avoid memory leaks.
 
 Practical Usage / Commands / Code:
@@ -555,25 +557,56 @@ Operations / Best Practices:
     - Cleanup           // NEVER forget to delete the dummy node before returning the final head.
 
 ── doubly linked list ───────────────────────────────────────────────
-A linked list where each node contains pointers to BOTH the next and previous nodes.
+A linked list where each node contains a value and two pointers 
+(one pointing to the next node, one to the previous), allowing bi-directional traversal.
 
 Key Notes:
-    - Allows O(1) backwards traversal and O(1) node deletion (if the node pointer is known).
-    - Overhead: Requires extra memory for the `prev` pointer.
+    - Memory overhead: Higher than singly linked lists due to the extra prev pointer.
+    - Time Complexity: Insert/Delete at Head or Tail is O(1).
+                       Insert/Delete at middle or Search is O(N).
+    - Traversal optimization: Can start searching from the tail if the target index is in the second half of the list.
 
 Practical Usage / Commands / Code:
-    struct DNode {
-        int item;
-        DNode* next;
-        DNode* prev;
-        DNode(int val = 0) : item(val), next(nullptr), prev(nullptr) {}
+    struct DoublyNode {
+        item;
+        DoublyNode* prev;
+        DoublyNode* next;
+        DoublyNode( val) : item(val), prev(nullptr), next(nullptr) {}
     };
 
-    // O(1) Deletion of a known node:
-    if (node->prev) node->prev->next = node->next;
-    if (node->next) node->next->prev = node->prev;
-    delete node;
+    class DoublyLinkedList {
+    private:
+        DoublyNode* head;
+        DoublyNode* tail;
+        int size;
+    public:
+        void pushBack(<DataType> val) {
+            DoublyNode* newNode = new DoublyNode(val);
+            if (!head) {
+                head = tail = newNode;
+            } else {
+                tail->next = newNode;
+                newNode->prev = tail;
+                tail = newNode;
+            }
+            size++;
+        }
 
+        void removeNode(DoublyNode* current) {
+            if (!current) return;
+            if (current->prev) current->prev->next = current->next;
+            if (current->next) current->next->prev = current->prev;
+            if (current == head) head = current->next;
+            if (current == tail) tail = current->prev;
+            delete current;
+            size--;
+        }
+    };
+
+Operations / Best Practices:
+    - Pointer Management   // Always meticulously update both prev and next pointers simultaneously.
+    - Edge Cases           // Carefully handle removals when size == 1 or when the list is empty.
+    
 ── circular linked list ───────────────────────────────────────────────
 A linked list where the last node (tail) points back to the first node (head) instead of null.
 
@@ -616,6 +649,7 @@ Practical Usage / Commands / Code:
 
     // 2. Cycle Detection
     // If fast == slow at any point during traversal, a cycle exists.
+    
 */
 
 
