@@ -219,3 +219,167 @@ Operations / Best Practices:
 
 */
 
+// ════════════════════════════════════════════════════════════════════════
+// [03] BINARY SEARCH 
+// ════════════════════════════════════════════════════════════════════════
+/*
+── Core Concept & Manual Implementation ────────────────────────
+A divide-and-conquer algorithm that finds a target in a sorted collection by repeatedly halving the search space.
+
+Key Notes:
+    - The collection MUST be sorted before searching.
+    - Primarily used for finding exact values, minimums, or maximums.
+    - Time Complexity: O(log N).
+    - Space Complexity: O(1) iterative, O(log N) recursive.
+
+Practical Usage / Commands / Code:
+    int binarySearch(const vector& arrayName, dataType targetValue) {
+        int leftPtr = 0;
+        int rightPtr = arrayName.size() - 1;
+        while (leftPtr <= rightPtr) {
+            // Prevents integer overflow:
+            int midPtr = leftPtr + (rightPtr - leftPtr) / 2; 
+            
+            if (arrayName[midPtr] == targetValue) return midPtr;
+            if (arrayName[midPtr] < targetValue) leftPtr = midPtr + 1;
+            else rightPtr = midPtr - 1;
+        }
+        return -1;
+    }
+
+Operations / Best Practices:
+    - leftPtr <= rightPtr                // Use <= to ensure single-element intervals are checked
+    - leftPtr + (rightPtr - leftPtr) / 2 // Always calculate mid this way to avoid integer overflow
+    - return -1                          // Standard sentinel value indicating "not found"
+
+── Binary Search on Range ─────────────────────────────────
+Instead of searching an array, 
+search a monotonic range of possible valid answers using a predicate function.
+
+Key Notes:
+    - Requires a boolean `isValid(mid)` function that evaluates if a state is possible.
+    - The solution space must be monotonic (e.g., F F F T T T or T T T F F F).
+    - Time Complexity: O(log(Search Space) * O(Predicate Function)).
+
+Practical Usage / Commands / Code:
+    bool isValid(int midValue, int targetCondition) {
+        // Evaluates if midValue satisfies the specific problem conditions
+        return currentAccumulation >= targetCondition;
+    }
+
+    int searchAnswer(int minLimit, int maxLimit, int targetCondition) {
+        int leftPtr = minLimit, rightPtr = maxLimit, bestAnswer = maxLimit;
+        
+        while (leftPtr <= rightPtr) {
+            int midPtr = leftPtr + (rightPtr - leftPtr) / 2;
+            
+            if (isValid(midPtr, targetCondition)) {
+                bestAnswer = midPtr;         // Record valid answer
+                rightPtr = midPtr - 1;       // Try to find a smaller/better answer
+            } else {
+                leftPtr = midPtr + 1;        // Increase to meet conditions
+            }
+        }
+        return bestAnswer;
+    }
+
+Operations / Best Practices:
+    - bestAnswer = midPtr // Always save the valid mid state before moving pointers
+    - rightPtr = mid - 1  // Adjust bounds based on whether you need the minimum or maximum valid answer
+
+── Binary Search on Doubles Range (Floating-Point) ───────────────────
+Binary search adapted for continuous values (e.g., long double) rather than discrete integers.
+
+Key Notes:
+    - Avoid standard `left <= right` because precision limits can cause infinite loops.
+    - Iterate a fixed number of times (e.g., 100-300) for guaranteed precision and termination.
+    - Do NOT use `mid + 1` or `mid - 1`; bounds update directly to `mid`.
+
+Practical Usage / Commands / Code:
+    bool isValidDouble(double midValue, const vector& arrayName) {
+        // Continuous evaluation logic
+        return checkCondition;
+    }
+
+    double searchDoubleAnswer(double minLimit, double maxLimit, const vector<double>& arrayName) {
+        double leftPtr = minLimit, rightPtr = maxLimit, bestAnswer = minLimit;
+        int iterations = 300; // Fixed iterations for high precision (e.g., 10^-9)
+        
+        while (leftPtr <= rightPtr && iterations--) {
+            double midPtr = leftPtr + (rightPtr - leftPtr) / 2.0;
+            
+            if (isValidDouble(midPtr, arrayName)) {
+                bestAnswer = midPtr;
+                leftPtr = midPtr;    // Update directly to mid (NO +/- 1)
+            } else {
+                rightPtr = midPtr;   // Update directly to mid (NO +/- 1)
+            }
+        }
+        return bestAnswer;
+    }
+
+Operations / Best Practices:
+    - int iterations = 300 // Runs in O(1) loop operations but secures extreme precision safely
+    - leftPtr = midPtr     // Floating point bounds shift exactly to mid, preventing skipping valid decimals
+
+── Virtual 1D Array Mapping ─────────────────────────────────────
+Treats a row-major sorted M x N matrix as a virtual 1D array of size M * N. 
+Converts a 1D mid-index back into 2D row/col coordinates using basic division and modulo operations.
+
+Key Notes:
+    - Time Complexity: O(log(M * N))
+    - Space Complexity: O(1) auxiliary space
+    - Row Index Formula: row = mid / cols
+    - Column Index Formula: col = mid % cols
+    - Precondition: Each row must be sorted, and the first element 
+                    of each row must be greater than the last element of the previous row
+
+Practical Usage / Code:
+    bool searchMatrix(const vector<vector>& MatrixName, int TargetValue) {
+        int rows = MatrixName.size(), cols = MatrixName[0].size();
+        int left = 0, right = (rows * cols) - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            int row = mid / cols, col = mid % cols;
+            int currentVal = MatrixName[row][col];
+
+            if (currentVal == TargetValue)
+                return true;
+            else if (TargetValue < currentVal)
+                right = mid - 1;
+            else
+                left = mid + 1;
+        }
+        return false;
+    }
+Operations / Best Practices:
+    - Index Mapping       // Use mid / cols to get row and mid % cols to get column
+    - Avoid Overflow      // Use left + (right - left) / 2 or midpoint(left, right)
+    - Edge Validation     // Ensure matrix is non-empty (rows > 0 && cols > 0) prior to indexing
+
+── STL Algorithms () ────────────────────────────────
+C++ standard library functions that perform binary search operations on sorted ranges using iterators.
+
+Key Notes:
+    - Requires `#include <algorithm>`.
+    - Time Complexity: O(log N) for random-access iterators (like vector).
+    - Can accept custom comparator functions as an optional last argument.
+
+Practical Usage / Commands / Code:
+    // 1. Check if element exists (returns bool)
+    bool isFound = binary_search(containerName.begin(), containerName.end(), targetValue);
+
+    // 2. Find first element >= target (returns iterator)
+    auto lowerItr = lower_bound(containerName.begin(), containerName.end(), targetValue);
+    
+    // 3. Find first element > target (returns iterator)
+    auto upperItr = upper_bound(containerName.begin(), containerName.end(), targetValue);
+
+Operations / Best Practices:
+    - distance(containerName.begin(), itrName)  // Gets the integer index from the returned iterator
+    - itrName - containerName.begin()                // Alternative, faster index extraction for vectors
+    - itrName != containerName.end()                 // Verifies exact match when using lower_bound
+    - sort(containerName.begin(), containerName.end()) // Ensure collection is sorted beforehand
+*/
+
