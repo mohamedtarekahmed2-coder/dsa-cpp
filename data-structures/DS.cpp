@@ -652,6 +652,35 @@ Practical Usage / Commands / Code:
     
 */
 
+// ════════════════════════════════════════════════════════════════════════
+// [07]  TREE
+// ════════════════════════════════════════════════════════════════════════
+/*
+── what is trees ───────────────────────────────────────────────
+types:
+-Binary tree.
+-Binary search tree.
+-AVL tree or height balanced binary tree.
+-Huffman coding tree.
+
+root, parents, children, Leaves, Internal nodes, Siblings, Ancestor, 
+Depth of node(a), Height or node(a), edges, out degree, in degree, total degree, 
+── Binary trees ───────────────────────────────────────────────
+at most 2 child
+right & left - child of root
+
+-full/strictly binary tree: if every node has zero or two children
+-complete binary tree: All levels is comletely filled except the last level, all nodes as left as possible in last level.
+-prefect binary tree: every nodes has two children, all leaves are at the same level.
+-Balanced binary tree: the height or tree = o(log n), |h(left subtree) - h(right subtree)| <= 1;
+-degenerate/ pathological tree(like linked list ): every parent node has only one child either left or right.
+max # of nodes at level n = 2^n
+max # of nodes at a binary tree = 2^(h+1) - 1
+
+── Binary trees ───────────────────────────────────────────────
+
+*/
+
 
 #include <iostream>
 using namespace std;
