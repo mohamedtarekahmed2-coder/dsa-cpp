@@ -677,10 +677,188 @@ right & left - child of root
 max # of nodes at level n = 2^n
 max # of nodes at a binary tree = 2^(h+1) - 1
 
-── Binary trees ───────────────────────────────────────────────
+── Binary trees Traversal ───────────────────────────────────────────────
+Tree traversals and Binary Search Tree (BST) operations can be visualized using this target tree:
+       10
+      /  \
+     5    15
+    / \     \
+   2   7     20
+── Depth-First Traversal (DFT) ───────────────────────────────────────────────
+Depth-first traversal explores as deep as possible along each branch before backtracking.
+A. Pre-Order Traversal (Root -> Left -> Right)Logic: 
+Visit the Node, go Left, then go Right.Order of Visits: 
+    10 -> 5 -> 2 -> 7 -> 15 -> 20
+        (1) 10
+        /    \
+     (2) 5  (5) 15
+      /   \      \
+   (3) 2  (4) 7  (6) 20
+Output: 10 5 2 7 15 20
+void preOrder(Node *head)
+{
+    if (head)
+    {
+        cout << head->item << ' ';
+        preOrder(head->left);
+        preOrder(head->right);
+    }
+}
+
+B. In-Order Traversal (Left -> Root -> Right)Logic: 
+Go Left, visit the Node, then go Right.Key Feature: 
+    Outputs nodes of a BST in sorted ascending order.
+    Order of Visits: 2 -> 5 -> 7 -> 10 -> 15 -> 20       
+        (4) 10
+        /    \
+     (2) 5  (5) 15
+      /   \      \
+   (1) 2  (3) 7  (6) 20
+Output: 2 5 7 10 15 20
+
+void inOrder(Node *head)
+{
+    if (head)
+    {
+        inOrder(head->left);
+        cout << head->item << ' ';
+        inOrder(head->right);
+    }
+}
+C. Post-Order Traversal (Left -> Right -> Root)Logic: 
+Go Left, go Right, then visit the Node.
+Order of Visits: 2 -> 7 -> 5 -> 20 -> 15 -> 10
+        (6) 10
+        /    \
+     (3) 5  (5) 15
+      /   \      \
+   (1) 2  (2) 7  (4) 20
+Output: 2 7 5 20 15 10
+
+
+void postOrder(Node *head)
+{
+    if (head)
+    {
+        postOrder(head->left);
+        postOrder(head->right);
+        cout << head->item << ' ';
+    }
+}
+                            
+── Breadth-First Traversal (Level-Order) ───────────────────────────────────────────────
+Level-Order visits nodes level by level from top to bottom, 
+left to right, using a Queue to track nodes.
+ 
+Level 0:       10            ---> Output: 10
+              /  \
+Level 1:     5    15         ---> Output: 5, 15
+            / \     \
+Level 2:   2   7     20      ---> Output: 2, 7, 20
+Final Output: 10 5 15 2 7 20
+
+Step 1: Pop 10 | Push Children (5, 15)  | Queue: [5, 15]        | Printed: 10
+Step 2: Pop 5  | Push Children (2, 7)   | Queue: [15, 2, 7]     | Printed: 10 5
+Step 3: Pop 15 | Push Child (20)        | Queue: [2, 7, 20]     | Printed: 10 5 15
+Step 4: Pop 2  | No Children            | Queue: [7, 20]        | Printed: 10 5 15 2
+Step 5: Pop 7  | No Children            | Queue: [20]           | Printed: 10 5 15 2 7
+Step 6: Pop 20 | No Children            | Queue: [] (Empty)     | Printed: 10 5 15 2 7 20
+
+void levelOrder(Node *root)
+{
+    if (!root) return;
+    
+    queue<Node *> travel;
+    travel.push(root);
+    
+    while (!travel.empty())
+    {
+        Node *current = travel.front();
+        travel.pop();
+        
+        cout << current->item << ' ';
+        
+        if (current->left)
+            travel.push(current->left);
+        if (current->right)
+            travel.push(current->right);
+    }
+}
+        
+── Binary Search Tree (BST) Operations ───────────────────────────────────────────────
+A. Search (Search for key = 7)Logic: 
+If target <= current node, go left.
+Otherwise, go right.
+Step 1: Compare 7 with Root (10)
+        7 <= 10  --> Go Left to 5
+
+       (10)
+       /
+      5
+
+Step 2: Compare 7 with Current (5)
+        7 > 5    --> Go Right to 7
+
+      5
+       \
+       (7)
+
+Step 3: Current (7) == Target (7) --> Found!
+
+B. Insert (Insert key = 12)Logic: 
+Traverse down using the search rule until you hit a NULL pointer, 
+then attach the new node as a leaf.
+PlaintextStep 1: Compare 12 with 10 --> 12 > 10, Go Right
+
+       10
+         \
+          15
+Step 2: Compare 12 with 15 --> 12 <= 15, Go Left
+
+          15
+         /
+       NULL
+Step 3: Root reached NULL --> Insert 12 as new Leaf Node
+
+          15
+         /
+       [12]  <-- New Node Attached
+
+C. Deletion (The 3 Cases of BST Deletion):
+Case 1: Node with No Children (Leaf Node)
+Logic: Disconnect and remove the node directly.
+Action: Set the parent's pointer to NULL.
+Plaintext
+      50                  50
+     /  \     Delete     /  \
+   30    70    20      30    70
+  /                   /
+ 20               (NULL)
+
+Case 2: Node with One Child
+Logic: Bypass the target node by connecting its parent directly to its child.
+Action: Replace the node with its single child.
+Plaintext
+      50                  50
+     /  \     Delete     /  \
+   30    70    30      25    70
+  /                   /
+ 25                 (25 replaces 30)
+
+Case 3: Node with Two Children
+Logic: You cannot simply remove the node without breaking the tree structure. Instead:
+Find the Inorder Successor (the smallest value in the right subtree) or the Inorder Predecessor (the largest value in the left subtree).
+Copy the successor's value into the node you want to delete.
+Recursively delete the original successor node (which will always be a Case 1 or Case 2 deletion).
+
+Plaintext
+      50                  60 (Successor copied)
+     /  \     Delete     /  \
+   30    70    50      30    70
+        /                   /
+      60                  (NULL) (Old 60 deleted)
 
 */
-
 
 #include <iostream>
 using namespace std;
